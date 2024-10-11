@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Bat Ball Stump Game</title>
+  <style>
+
+
+    body {
+      font-family: 'Arial', sans-serif;
+   
+      text-align: center;
+      padding: 20px;
+    }
+
+
+    /* Adding a semi-transparent overlay */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(188, 188, 188, 0.5); /* Adjust this value to control transparency */
+      z-index: -1; /* Place it behind the content */
+    }
+    
+    h1 {
+      color: rgb(60, 148, 156);
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .choices-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .choice-btn {
+      background-color: #c25d6e;
+      border: none;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .choice-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .choice-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+    }
+
+    h3 {
+      color: #2c3e50;
+      margin-top: 10px;
+      font-size: 1.2rem;
+    }
+
+    #score {
+      font-size: 1.5rem;
+      color: #2980b9;
+      margin-top: 20px;
+    }
+
+    .reset-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+
+    .reset-btn:hover {
+      background-color: #c0392b;
+    }
+
+    footer {
+      margin-top: 40px;
+      color: #000000;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Bat Ball Stump Game</h1>
+
+  <div class="choices-container">
+    <button class="choice-btn" onclick="
+   let computerChoice=generateComputerChoice();
+   let resultMsg=getResult('Bat',computerChoice);
+   showResult('Bat',computerChoice,resultMsg);
+  ">
+      <img src="images/bat.jpg" alt="Bat" class="choice-image">
+    </button>
+
+    <button class="choice-btn" onclick="
+   computerChoice=generateComputerChoice();
+   resultMsg=getResult('Ball',computerChoice);
+  showResult('Ball', computerChoice, resultMsg);
+">
+      <img src="images/ball.webp" alt="Ball" class="choice-image">
+    </button>
+
+    <button class="choice-btn" onclick="
+ computerChoice=generateComputerChoice();
+  resultMsg=getResult('Stump',computerChoice);
+  showResult('Stump', computerChoice, resultMsg);
+">
+      <img src="images/stump.webp" alt="Stump" class="choice-image">
+    </button>
+  </div>
+
+  <h3 id="user-move"></h3>
+  <h3 id="computer-move"></h3>
+  <h3 id="result"></h3>
+  <h3 id="score"></h3>
+
+  <button class="reset-btn" onclick="localStorage.clear(); resetScore();">Reset Game</button>
+
+  <footer>
+    <p>&copy; 2024 Cricket Game. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    let scoreStr = localStorage.getItem('Score');
+    let score;
+    resetScore(scoreStr);
+
+    function resetScore(scoreStr) {
+      score = scoreStr ? JSON.parse(scoreStr) : {
+        win: 0,
+        lost: 0,
+        tie: 0,
+      };
+      score.displayScore = function () {
+        return `Won: ${score.win} | Lost: ${score.lost} | Tie: ${score.tie}`;
+      };
+      showResult();
+    }
+
+    function generateComputerChoice() {
+      let randomNumber = Math.random() * 3;
+      if (randomNumber <= 1) {
+        return 'Bat';
+      } else if (randomNumber <= 2) {
+        return 'Ball';
+      } else {
+        return 'Stump';
+      }
+    }
+
+    function getResult(userMove, computerMove) {
+      if (userMove === 'Bat') {
+        if (computerMove === 'Bat') {
+          score.tie++;
+          return 'It\'s a tie!';
+        } else if (computerMove === 'Ball') {
+          score.win++;
+          return 'You win!';
+        } else {
+          score.lost++;
+          return 'Computer wins!';
+        }
+      } else if (userMove === 'Ball') {
+        if (computerMove === 'Bat') {
+          score.lost++;
+          return 'Computer wins!';
+        } else if (computerMove === 'Ball') {
+          score.tie++;
+          return 'It\'s a tie!';
+        } else {
+          score.win++;
+          return 'You win!';
+        }
+      } else {
+        if (computerMove === 'Bat') {
+          score.win++;
+          return 'You win!';
+        } else if (computerMove === 'Ball') {
+          score.lost++;
+          return 'Computer wins!';
+        } else {
+          score.tie++;
+          return 'It\'s a tie!';
+        }
+      }
+    }
+
+    function showResult(userMove, computerMove, result) {
+      localStorage.setItem('Score', JSON.stringify(score));
+
+      document.querySelector('#user-move').innerText =
+        userMove ? `You chose ${userMove}` : '';
+      document.querySelector('#computer-move').innerText =
+        computerMove ? `Computer chose ${computerMove}` : '';
+      document.querySelector('#result').innerText = result || '';
+      document.querySelector('#score').innerText = `The score is ${score.displayScore()}`;
+    }
+  </script>
+
+</body>
+
+</html>
